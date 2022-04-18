@@ -7,6 +7,9 @@ class Sticker {
     this._parent = document.appendChild(this._elem);
 
     this._zIndexer = zIndexer;
+
+    this._watchSize();
+    this._watchText();
   }
 
   _setW(value) {
@@ -69,7 +72,22 @@ class Sticker {
     if(maxZ !== this.getZ() || maxZ === 0) {
       this._setZ(maxZ + 1);
     }
-  }  
+  } 
+
+  _watchSize() {
+    this._elem.addEventListener('mouseup', () => {
+      let newWidth = parseInt(this._elem.clientWidth);
+      let newHeight = parseInt(this._elem.clientHeight);
+
+      if (newWidth !== this._getW()) {
+        this._setW(newWidth);
+      }
+
+      if (newHeight !== this._getH()) {
+        this._setH(newHeight);
+      }
+    })
+  }
 
   _watchText() {
     this._elem.addEventListener('blur', () => {
@@ -78,6 +96,16 @@ class Sticker {
       if(newText !== this._getText()) {
         this._setText(newText);
       }
+    })
+  }
+
+  _initTopState() {
+    this._elem.addEventListener('click', () => {
+      this._setMaxZ();
+    })
+
+    this._elem.addEventListener('dragstart', () => {
+      this._setMaxZ();
     })
   }
 }
