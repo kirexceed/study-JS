@@ -1,7 +1,11 @@
 class Sticker {
-  constructor (parent, key, id, zIndexer) {
+  constructor(parent, key, id, zIndexer) {
     this._elem = document.createElement('textarea');
+    this._elem.style.resize = 'none'
+    this._elem.style.borderRadius = '4px'
+    this._elem.style.boxShadow = '1px 1px 2px 1px #00000025'
     this._elem.className = 'sticker';
+
 
     this._parent = parent;
     this._parent.appendChild(this._elem);
@@ -14,6 +18,7 @@ class Sticker {
 
     this._watchSize();
     this._watchText();
+    this._stock = new Stock(key, id)
   }
 
   create(w, h, x, y) {
@@ -25,9 +30,30 @@ class Sticker {
     this._setMaxZ();
   }
 
+  restore(data) {
+    this._setW(data.w)
+    this._setH(data.h);
+    this._setX(data.x);
+    this._setY(data.y);
+    this._setZ(data.z);
+    this._setText(data.text);
+  }
+  _save() {
+    let data = {
+      x: this._getX(),
+      y: this._getY(),
+      z: this.getZ(),
+      w: this._getW(),
+      h: this._getH(),
+      text: this._getText()
+    }
+    this._stock.save(data)
+  }
+
   _setW(value) {
     this._w = value;
     this._elem.style.width = value + 'px';
+    this._save()
   }
 
   _getW() {
@@ -37,6 +63,8 @@ class Sticker {
   _setH(value) {
     this._h = value;
     this._elem.style.height = value + 'px';
+    this._save()
+
   }
 
   _getH() {
@@ -46,6 +74,8 @@ class Sticker {
   _setX(value) {
     this._x = value;
     this._elem.style.left = value + 'px';
+    this._save()
+
   }
 
   _getX() {
@@ -55,6 +85,8 @@ class Sticker {
   _setY(value) {
     this._y = value;
     this._elem.style.top = value + 'px';
+    this._save()
+
   }
 
   _getY() {
@@ -64,6 +96,8 @@ class Sticker {
   _setZ(value) {
     this._z = value;
     this._elem.style.zIndex = value;
+    this._save()
+
   }
 
   getZ() {
@@ -73,6 +107,8 @@ class Sticker {
   _setText(text) {
     this.text = text;
     this._elem.value = text;
+    this._save()
+
   }
 
   _getText() {
@@ -81,17 +117,18 @@ class Sticker {
 
   _setMaxZ() {
     let maxZ = this._zIndexer.getMaxZ();
-
-    if(maxZ !== this.getZ() || maxZ === 0) {
+    console.log('set max z');
+    if (maxZ !== this.getZ() || maxZ === 0) {
       this._setZ(maxZ + 1);
     }
-  } 
+  }
 
   _watchSize() {
     this._elem.addEventListener('mouseup', () => {
+      console.log('mouseup');
       let newWidth = parseInt(this._elem.clientWidth);
       let newHeight = parseInt(this._elem.clientHeight);
-
+      console.log(this._elem.clientWidth, newWidth);
       if (newWidth !== this._getW()) {
         this._setW(newWidth);
       }
@@ -104,9 +141,10 @@ class Sticker {
 
   _watchText() {
     this._elem.addEventListener('blur', () => {
+      console.log('blur');
       let newText = this._elem.value;
 
-      if(newText !== this._getText()) {
+      if (newText !== this._getText()) {
         this._setText(newText);
       }
     })
@@ -114,17 +152,21 @@ class Sticker {
 
   _initTopState() {
     this._elem.addEventListener('click', () => {
+      console.log('click');
       this._setMaxZ();
     })
 
     this._elem.addEventListener('dragstart', () => {
+      console.log('dragstart');
       this._setMaxZ();
     })
   }
 
   _initRemove() {
     this._elem.addEventListener('mousedown', event => {
-      if(event.wich == 2) {
+      console.log('mousedown');
+
+      if (event.wich == 2) {
         this._parent.removeChild(this._elem);
       }
       event.preventDefault();
@@ -138,11 +180,14 @@ class Sticker {
     let correctionY = 0;
 
     this._elem.addEventListener('dragstart', event => {
+      console.log('dragstart');
+
       correctionX = this._getX() - event.pageX;
       correctionY = this._getY() - event.pageY;
     })
 
     this._elem.addEventListener('dragend', event => {
+      console.log('dragend');
       this._setX(correctionX + event.pageX);
       this._setY(correctionY + event.pageY);
 
@@ -161,7 +206,7 @@ class ZIndexer {
   }
 
   getMaxZ() {
-    if(this._stickers.length !== 0) {
+    if (this._stickers.length !== 0) {
       console.log('stickers', this._stickers);
       let zindexes = [];
       console.log('zindexes', zindexes);
@@ -201,7 +246,7 @@ class Stock {
   _extract() {
     let data = this._storage.get();
 
-    if(data === null) {
+    if (data === null) {
       return {}
     } else {
       return JSON.parse(data);
@@ -227,7 +272,8 @@ let id = 0;
 let zIndexer = new ZIndexer;
 
 window.addEventListener('dblclick', event => {
-  id ++;
+  console.log('dbclick');
+  id++;
 
   let sticker = new Sticker(document.body, key, id, zIndexer);
   sticker.create(150, 200, event.pageX, event.pageY);
