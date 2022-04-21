@@ -2,8 +2,8 @@ class Sticker {
   constructor(parent, key, id, zIndexer) {
     this._elem = document.createElement('textarea');
     // this._elem.style.resize = 'none'
-    // this._elem.style.borderRadius = '4px'
-    // this._elem.style.boxShadow = '1px 1px 2px 1px #00000025'
+    this._elem.style.borderRadius = '4px'
+    this._elem.style.boxShadow = '1px 1px 2px 1px #00000025'
     this._elem.className = 'sticker';
 
     this._parent = parent;
@@ -17,7 +17,7 @@ class Sticker {
 
     this._watchSize();
     this._watchText();
-    // this._stock = new Stock(key, id)
+    this._stock = new Stock(key, id)
   }
   create(w, h, x, y) {
     this._setW(w);
@@ -28,31 +28,31 @@ class Sticker {
     this._setMaxZ();
   }
 
-//   restore(data) {
-//     this._setW(data.w)
-//     this._setH(data.h);
-//     this._setX(data.x);
-//     this._setY(data.y);
-//     this._setZ(data.z);
-//     this._setText(data.text);
-//   }
+  restore(data) {
+    this._setW(data.w)
+    this._setH(data.h);
+    this._setX(data.x);
+    this._setY(data.y);
+    this._setZ(data.z);
+    this._setText(data.text);
+  }
 
-//   _save() {
-//     let data = {
-//       x: this._getX(),
-//       y: this._getY(),
-//       z: this.getZ(),
-//       w: this._getW(),
-//       h: this._getH(),
-//       text: this._getText()
-//     }
-//     this._stock.save(data)
-//   }
+  _save() {
+    let data = {
+      x: this._getX(),
+      y: this._getY(),
+      z: this.getZ(),
+      w: this._getW(),
+      h: this._getH(),
+      text: this._getText()
+    }
+    this._stock.save(data)
+  }
 
   _setW(value) {
     this._w = value;
     this._elem.style.width = value + 'px';
-    // this._save()
+    this._save()
   }
 
   _getW() {
@@ -62,7 +62,7 @@ class Sticker {
   _setH(value) {
     this._h = value;
     this._elem.style.height = value + 'px';
-    // this._save()
+    this._save()
 
   }
 
@@ -73,7 +73,7 @@ class Sticker {
   _setX(value) {
     this._x = value;
     this._elem.style.left = value + 'px';
-    // this._save()
+    this._save()
 
   }
 
@@ -84,7 +84,7 @@ class Sticker {
   _setY(value) {
     this._y = value;
     this._elem.style.top = value + 'px';
-    // this._save()
+    this._save()
 
   }
 
@@ -95,7 +95,7 @@ class Sticker {
   _setZ(value) {
     this._z = value;
     this._elem.style.zIndex = value;
-    // this._save()
+    this._save()
   }
 
   getZ() {
@@ -105,7 +105,7 @@ class Sticker {
   _setText(text) {
     this._text = text;
     this._elem.value = text;
-    // this._save()
+    this._save()
   }
 
   _getText() {
@@ -206,76 +206,76 @@ class ZIndexer {
   }
 }
 
-// class Stock {
-//   constructor(key, id = null) {
-//     this._storage = new Storage(key);
-//     this._id = id;
-//   }
+class Stock {
+  constructor(key, id = null) {
+    this._storage = new Storage(key);
+    this._id = id;
+  }
 
-//   save(value) {
-//     let data = this._extract();
-//     data[this._id] = value;
-//     this._compact(data);
-//   }
+  save(value) {
+    let data = this._extract();
+    data[this._id] = value;
+    this._compact(data);
+  }
 
-//   remove() {
-//     let data = this._extract();
-//     delete data[this._id];
-//     this._compact(data);
-//   }
+  remove() {
+    let data = this._extract();
+    delete data[this._id];
+    this._compact(data);
+  }
 
-//   get() {
-//     let data = this._extract();
-//     if (data[this.id] !== undefined) {
-//       return data[this.id];
-//     }
-//   }
+  get() {
+    let data = this._extract();
+    if (data[this.id] !== undefined) {
+      return data[this.id];
+    }
+  }
 
-//   getAll() {
-//     return this._extract();
-//   }
+  getAll() {
+    return this._extract();
+  }
 
-//   _compact(data) {
-//     this._storage.save(JSON.stringify(data));
-//   }
+  _compact(data) {
+    this._storage.save(JSON.stringify(data));
+  }
 
-//   _extract() {
-//     let data = this._storage.get();
+  _extract() {
+    let data = this._storage.get();
 
-//     if (data === null) {
-//       return {}
-//     } else {
-//       return JSON.parse(data);
-//     }
-//   }
-// }
+    if (data === null) {
+      return {}
+    } else {
+      return JSON.parse(data);
+    }
+  }
+}
 
-// class Storage {
-//   constructor(key) {
-//     this._key = key;
-//   }
+class Storage {
+  constructor(key) {
+    this._key = key;
+  }
 
-//   save(data) {
-//     localStorage.setItem(this._key, data);
-//   }
+  save(data) {
+    localStorage.setItem(this._key, data);
+  }
 
-//   get() {
-//     return localStorage.getItem(this._key);
-//   }
-// }
+  get() {
+    return localStorage.getItem(this._key);
+  }
+}
 
 let key = 'stickers';
 let id = 0;
 let zIndexer = new ZIndexer;
-// let stock = new Stock(key);
-// let globalData = stock.getAll();
+let stock = new Stock(key);
+let globalData = stock.getAll();
 
-// for (id in globalData) {
-//   let sticker = new Sticker(document.body, key, id, zIndexer);
-//   sticker.restore(globalData[id])
+for (id in globalData) {
+  let sticker = new Sticker(document.body, key, id, zIndexer);
+  sticker.restore(globalData[id])
 
-//   zIndexer.add(sticker);
-// }
+  zIndexer.add(sticker);
+}
 
 window.addEventListener('dblclick', event => {
   id++;
