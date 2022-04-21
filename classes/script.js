@@ -1,7 +1,7 @@
 class Sticker {
   constructor(parent, key, id, zIndexer) {
     this._elem = document.createElement('textarea');
-    this._elem.style.resize = 'none'
+    // this._elem.style.resize = 'none'
     this._elem.style.borderRadius = '4px'
     this._elem.style.boxShadow = '1px 1px 2px 1px #00000025'
     this._elem.className = 'sticker';
@@ -13,14 +13,13 @@ class Sticker {
     this._zIndexer = zIndexer;
 
     this._initRelocation();
-    this._initRemove();
+    // this._initRemove();
     this._initTopState();
 
     this._watchSize();
     this._watchText();
     this._stock = new Stock(key, id)
   }
-
   create(w, h, x, y) {
     this._setW(w);
     this._setH(h);
@@ -97,7 +96,6 @@ class Sticker {
     this._z = value;
     this._elem.style.zIndex = value;
     this._save()
-
   }
 
   getZ() {
@@ -105,19 +103,16 @@ class Sticker {
   }
 
   _setText(text) {
-    this.text = text;
+    this._text = text;
     this._elem.value = text;
     this._save()
-
   }
 
   _getText() {
     return this._text;
   }
-
   _setMaxZ() {
     let maxZ = this._zIndexer.getMaxZ();
-    console.log('set max z');
     if (maxZ !== this.getZ() || maxZ === 0) {
       this._setZ(maxZ + 1);
     }
@@ -128,13 +123,12 @@ class Sticker {
       console.log('mouseup');
       let newWidth = parseInt(this._elem.clientWidth);
       let newHeight = parseInt(this._elem.clientHeight);
-      console.log(this._elem.clientWidth, newWidth);
       if (newWidth !== this._getW()) {
-        this._setW(newWidth);
+        this._setW(newWidth + 2);
       }
 
       if (newHeight !== this._getH()) {
-        this._setH(newHeight);
+        this._setH(newHeight + 2);
       }
     })
   }
@@ -162,16 +156,16 @@ class Sticker {
     })
   }
 
-  _initRemove() {
-    this._elem.addEventListener('mousedown', event => {
-      console.log('mousedown');
+//   _initRemove() {
+//     this._elem.addEventListener('mousedown', event => {
+//       console.log('mousedown');
 
-      if (event.wich == 2) {
-        this._parent.removeChild(this._elem);
-      }
-      event.preventDefault();
-    })
-  }
+//       if (event.wich == 2) {
+//         this._parent.removeChild(this._elem);
+//       }
+//       event.preventDefault();
+//     })
+//   }
 
   _initRelocation() {
     this._elem.draggable = true;
@@ -207,12 +201,9 @@ class ZIndexer {
 
   getMaxZ() {
     if (this._stickers.length !== 0) {
-      console.log('stickers', this._stickers);
       let zindexes = [];
-      console.log('zindexes', zindexes);
 
       this._stickers.forEach(sticker => {
-        console.log(sticker.style);
         zindexes.push(sticker.getZ());
       })
 
@@ -239,6 +230,17 @@ class Stock {
     this._compact(data);
   }
 
+  get() {
+    let data = this._extract();
+    if (data[this.id] !== undefined) {
+      return data[this.id];
+    }
+  }
+
+  getAll() {
+    return this._extract();
+  }
+
   _compact(data) {
     this._storage.save(JSON.stringify(data));
   }
@@ -253,6 +255,7 @@ class Stock {
     }
   }
 }
+
 class Storage {
   constructor(key) {
     this._key = key;
@@ -270,9 +273,17 @@ class Storage {
 let key = 'stickers';
 let id = 0;
 let zIndexer = new ZIndexer;
+let stock = new Stock(key);
+let globalData = stock.getAll();
+
+for (id in globalData) {
+  let sticker = new Sticker(document.body, key, id, zIndexer);
+  sticker.restore(globalData[id])
+
+  zIndexer.add(sticker);
+}
 
 window.addEventListener('dblclick', event => {
-  console.log('dbclick');
   id++;
 
   let sticker = new Sticker(document.body, key, id, zIndexer);
