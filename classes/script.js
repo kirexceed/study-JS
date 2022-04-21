@@ -11,12 +11,12 @@ class Sticker {
 
     this._zIndexer = zIndexer;
 
-    // this._initRelocation();
+    this._initRelocation();
     // this._initRemove();
     this._initTopState();
 
     this._watchSize();
-    // this._watchText();
+    this._watchText();
     // this._stock = new Stock(key, id)
   }
   create(w, h, x, y) {
@@ -120,46 +120,37 @@ class Sticker {
 
   _watchSize() {
     this._elem.addEventListener('mouseup', () => {
-      console.log('mouseup');
       let newWidth = parseInt(this._elem.clientWidth);
       let newHeight = parseInt(this._elem.clientHeight);
-      console.log('this._getW()', this._getW());
-      console.log('this._getH()', this._getH());
-      console.log('newWidth', newWidth);
-      console.log('newHeight', newHeight);
       if (newWidth !== this._getW()) {
-        this._setW(newWidth);
+        this._setW(newWidth + 2);
       }
 
       if (newHeight !== this._getH()) {
-        this._setH(newHeight);
+        this._setH(newHeight + 2);
       }
-
-      console.log('this._getW()', this._getW());
-      console.log('this._getH()', this._getH());
     })
   }
 
-//   _watchText() {
-//     this._elem.addEventListener('blur', () => {
-//       console.log('blur');
-//       let newText = this._elem.value;
+  _watchText() {
+    this._elem.addEventListener('blur', () => {
+      let newText = this._elem.value;
 
-//       if (newText !== this._getText()) {
-//         this._setText(newText);
-//       }
-//     })
-//   }
+      if (newText !== this._getText()) {
+        this._setText(newText);
+      }
+    })
+  }
 
   _initTopState() {
     this._elem.addEventListener('click', () => {
       this._setMaxZ();
     })
 
-    // this._elem.addEventListener('dragstart', () => {
-    //   console.log('dragstart');
-    //   this._setMaxZ();
-    // })
+    this._elem.addEventListener('dragstart', () => {
+      console.log('dragstart');
+      this._setMaxZ();
+    })
   }
 
 //   _initRemove() {
@@ -173,27 +164,24 @@ class Sticker {
 //     })
 //   }
 
-//   _initRelocation() {
-//     this._elem.draggable = true;
+  _initRelocation() {
+    this._elem.draggable = true;
 
-//     let correctionX = 0;
-//     let correctionY = 0;
+    let correctionX = 0;
+    let correctionY = 0;
 
-//     this._elem.addEventListener('dragstart', event => {
-//       console.log('dragstart');
+    this._elem.addEventListener('dragstart', event => {
+      correctionX = this._getX() - event.pageX;
+      correctionY = this._getY() - event.pageY;
+    })
 
-//       correctionX = this._getX() - event.pageX;
-//       correctionY = this._getY() - event.pageY;
-//     })
+    this._elem.addEventListener('dragend', event => {
+      this._setX(correctionX + event.pageX);
+      this._setY(correctionY + event.pageY);
 
-//     this._elem.addEventListener('dragend', event => {
-//       console.log('dragend');
-//       this._setX(correctionX + event.pageX);
-//       this._setY(correctionY + event.pageY);
-
-//       this._elem.blur();
-//     })
-//   }
+      this._elem.blur();
+    })
+  }
 }
 
 class ZIndexer {
